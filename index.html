@@ -1,0 +1,115 @@
+<div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 650px; margin: 20px auto; padding: 30px; border: 1px solid #E3E5E0; background-color: #FFFFFF;">
+    
+    <h2 style="color: #000054; text-align: center; margin-top: 0; font-family: 'Museo', Arial, sans-serif; font-weight: 700; font-size: 28px;">CREATE Prompt Builder</h2>
+    <p style="font-size: 14px; color: #000000; text-align: center; margin-bottom: 25px;">Fill in the elements below to engineer a precise, targeted AI prompt.</p>
+
+    <!-- Character -->
+    <label style="font-weight: bold; color: #000000; font-size: 14px;">C - Character <span style="font-weight: normal; color: #000054;">(What role should the AI play?)</span></label>
+    <textarea id="c-input" rows="2" style="width: 100%; margin-top: 5px; margin-bottom: 15px; padding: 10px; border: 1px solid #E3E5E0; border-radius: 0; resize: vertical; font-family: inherit;" placeholder="e.g., Act as an English language tutor."></textarea>
+
+    <!-- Request -->
+    <label style="font-weight: bold; color: #000000; font-size: 14px;">R - Request <span style="font-weight: normal; color: #000054;">(What specifically do you want it to do?)</span></label>
+    <textarea id="r-input" rows="2" style="width: 100%; margin-top: 5px; margin-bottom: 15px; padding: 10px; border: 1px solid #E3E5E0; border-radius: 0; resize: vertical; font-family: inherit;" placeholder="e.g., Help me practice using English past, present, and future tenses."></textarea>
+
+    <!-- Examples -->
+    <label style="font-weight: bold; color: #000000; font-size: 14px;">E - Examples <span style="font-weight: normal; color: #000054;">(Provide a reference or context to guide it)</span></label>
+    <textarea id="e-input" rows="2" style="width: 100%; margin-top: 5px; margin-bottom: 15px; padding: 10px; border: 1px solid #E3E5E0; border-radius: 0; resize: vertical; font-family: inherit;" placeholder="e.g., Provide a clear example sentence for each tense to demonstrate how it is used."></textarea>
+
+    <!-- Adjustments -->
+    <label style="font-weight: bold; color: #000000; font-size: 14px;">A - Adjustments <span style="font-weight: normal; color: #000054;">(What constraints or rules must it follow?)</span></label>
+    <textarea id="a-input" rows="2" style="width: 100%; margin-top: 5px; margin-bottom: 15px; padding: 10px; border: 1px solid #E3E5E0; border-radius: 0; resize: vertical; font-family: inherit;" placeholder="e.g., Ensure all writing, vocabulary, and grammar remain at or below a B2 (Upper Intermediate) reading level."></textarea>
+
+    <!-- Type of Output -->
+    <label style="font-weight: bold; color: #000000; font-size: 14px;">T - Type of output <span style="font-weight: normal; color: #000054;">(How should the final answer look?)</span></label>
+    <textarea id="t-input" rows="3" style="width: 100%; margin-top: 5px; margin-bottom: 15px; padding: 10px; border: 1px solid #E3E5E0; border-radius: 0; resize: vertical; font-family: inherit;" placeholder="e.g., Output basic, easy-to-understand explanations of the three tenses, followed by a short set of quiz-style practice questions (e.g., fill-in-the-blank or multiple choice)."></textarea>
+
+    <!-- Extras -->
+    <label style="font-weight: bold; color: #000000; font-size: 14px;">E - Extras <span style="font-weight: normal; color: #000054;">(Any final behavioral constraints?)</span></label>
+    <textarea id="ex-input" rows="2" style="width: 100%; margin-top: 5px; margin-bottom: 15px; padding: 10px; border: 1px solid #E3E5E0; border-radius: 0; resize: vertical; font-family: inherit;" placeholder="e.g., End by asking if I need more support, clarification, or additional questions."></textarea>
+
+    <!-- Action Buttons -->
+    <div style="margin-top: 10px;">
+        <button onclick="generatePrompt()" style="padding: 12px 24px; background-color: #E61E2A; color: #FFFFFF; border: none; border-radius: 0; cursor: pointer; font-weight: bold; font-size: 14px; font-family: inherit;">Generate Prompt</button>
+        <button onclick="clearFields()" style="padding: 12px 24px; background-color: #E3E5E0; color: #000054; border: none; border-radius: 0; cursor: pointer; font-weight: bold; font-size: 14px; font-family: inherit; margin-left: 10px;">Clear Fields</button>
+    </div>
+
+    <!-- Output Section -->
+    <div style="margin-top: 30px; border-top: 4px solid #000054; padding-top: 20px;">
+        <label style="font-weight: bold; color: #000054; font-size: 16px;">Your Completed Prompt:</label>
+        <textarea id="final-output" rows="8" style="width: 100%; margin-top: 10px; margin-bottom: 15px; padding: 12px; border: 1px solid #000054; border-radius: 0; resize: vertical; background-color: #FAFAFA; font-family: monospace; font-size: 14px; color: #000000;" readonly></textarea>
+        
+        <button id="copy-btn" onclick="copyToClipboard()" style="padding: 12px 24px; background-color: #000054; color: #FFFFFF; border: none; border-radius: 0; cursor: pointer; font-weight: bold; font-size: 14px; font-family: inherit;">Copy to Clipboard</button>
+        <span id="copy-status" style="margin-left: 15px; color: #E61E2A; font-weight: bold; display: none;">Copied!</span>
+    </div>
+</div>
+
+<script>
+    function generatePrompt() {
+        const c = document.getElementById('c-input').value.trim();
+        const r = document.getElementById('r-input').value.trim();
+        const e = document.getElementById('e-input').value.trim();
+        const a = document.getElementById('a-input').value.trim();
+        const t = document.getElementById('t-input').value.trim();
+        const ex = document.getElementById('ex-input').value.trim();
+
+        let finalPrompt = [];
+
+        // Add Role/Character as the opening statement
+        if (c) finalPrompt.push(`${c}\n`);
+        
+        // Add Task/Request
+        if (r) finalPrompt.push(`**Task:**\n${r}`);
+        
+        // Group the remaining elements under clear Markdown headers
+        if (e) finalPrompt.push(`**Context & Examples:**\n- ${e}`);
+        if (a) finalPrompt.push(`**Constraints:**\n- ${a}`);
+        if (t) finalPrompt.push(`**Output Format:**\n- ${t}`);
+        if (ex) finalPrompt.push(`**Additional Instructions:**\n- ${ex}`);
+
+        // Join the sections with double line breaks
+        document.getElementById('final-output').value = finalPrompt.join('\n\n');
+        
+        document.getElementById('copy-status').style.display = 'none';
+        document.getElementById('copy-btn').innerText = 'Copy to Clipboard';
+    }
+
+    function copyToClipboard() {
+        const outputArea = document.getElementById('final-output');
+        
+        if (outputArea.value.trim() === '') {
+            alert('Please generate a prompt first.');
+            return;
+        }
+
+        outputArea.select();
+        outputArea.setSelectionRange(0, 99999); 
+
+        navigator.clipboard.writeText(outputArea.value).then(() => {
+            const statusLabel = document.getElementById('copy-status');
+            const copyBtn = document.getElementById('copy-btn');
+            
+            statusLabel.style.display = 'inline';
+            copyBtn.innerText = 'Copied!';
+            
+            setTimeout(() => {
+                statusLabel.style.display = 'none';
+                copyBtn.innerText = 'Copy to Clipboard';
+            }, 2500);
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            alert('Failed to copy text. You can manually copy it from the text box.');
+        });
+    }
+
+    function clearFields() {
+        document.getElementById('c-input').value = '';
+        document.getElementById('r-input').value = '';
+        document.getElementById('e-input').value = '';
+        document.getElementById('a-input').value = '';
+        document.getElementById('t-input').value = '';
+        document.getElementById('ex-input').value = '';
+        document.getElementById('final-output').value = '';
+        document.getElementById('copy-status').style.display = 'none';
+        document.getElementById('copy-btn').innerText = 'Copy to Clipboard';
+    }
+</script>
